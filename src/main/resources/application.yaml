@@ -1,0 +1,67 @@
+server:
+  port: 8081
+  
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: NEW_MICROSERVICES_PROJECT
+ 
+
+  application:
+    name: USER-SERVICE
+
+  config:
+    import: configserver:http://localhost:8085
+
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+      
+ 
+ 
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      
+      
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: count-based
+        
+        
+  retry:
+    instances:
+      ratingHotelBreaker:
+        max-attempts: 3
+        wait-duration: 5s
+      
+  
+  
+  ratelimiter:
+    instances:
+      userRateLimiter: 
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 0s    
